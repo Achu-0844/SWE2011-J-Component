@@ -1,0 +1,153 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1d3557, #457b9d);
+            color: #f1faee;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #ffffff;
+            color: #1d3557;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="url"] {
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            border: 2px solid #457b9d;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+            background-color: #457b9d;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1d3557;
+        }
+
+        #result {
+            margin-top: 2rem;
+            background-color: #f1faee;
+            padding: 1.5rem;
+            border-radius: 8px;
+            color: #1d3557;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: orange;
+            font-family: Georgia, serif;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fake News Detection</h1>
+        <form id="newsForm">
+            <label for="headline">News Headline:</label>
+            <input type="text" id="headline" name="headline" placeholder="Enter the news headline" required>
+            <label for="url">News URL:</label>
+            <input type="url" id="url" name="url" placeholder="Enter the news article URL" required>
+            <button type="submit">Analyze News</button>
+        </form>
+
+        <div id="result" style="display: none;">
+            <h3>Prediction Result:</h3>
+            <p id="prediction"></p>
+            <p id="author"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('newsForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const headline = document.getElementById('headline').value;
+            const url = document.getElementById('url').value;
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5001/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ headline, url }),
+                });
+                
+                const data = await response.json();
+                document.getElementById('prediction').textContent = `Prediction: ${data.prediction}`;
+                document.getElementById('author').textContent = `Author: ${data.author}`;
+
+                document.getElementById('result').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('prediction').textContent = 'Error processing your request.';
+                document.getElementById('result').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
